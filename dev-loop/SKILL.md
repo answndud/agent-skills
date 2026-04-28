@@ -40,15 +40,18 @@ Prefer the repository's existing task harness:
 - `docs/PROGRESS.md`: current incomplete state only
 - `docs/COMPLETED.md`: append-only archive
 
+These are default paths, not hard requirements. If the repository already has equivalent active roadmap, progress log, or completed archive documents, use and preserve the existing structure instead of creating duplicates. Examples include `docs/status/*`, `docs/tasks.md`, `business/**` workflow docs, or repo-specific active/archive docs named differently.
+
 Startup:
 
 1. Read `AGENTS.md` if it exists.
 2. Read `docs/PLAN.md` if it exists.
 3. Read `docs/PROGRESS.md` if it exists.
-4. Do not read `docs/COMPLETED.md` by default.
-5. Read `docs/COMPLETED.md` only when past implementation context is necessary.
+4. Look for equivalent roadmap/progress/archive docs if the default paths are missing or the repo clearly documents another workflow.
+5. Do not read archive docs such as `docs/COMPLETED.md` by default.
+6. Read archive docs only when past implementation context is necessary.
 
-If `docs/PLAN.md` or `docs/PROGRESS.md` does not exist, create the minimum task-specific harness only because the user requested this workflow for the current task. Inspect enough context first to make it useful:
+If active roadmap, progress log, or completed archive docs are missing, create the minimum task-specific harness only because the user requested this workflow for the current task. Use the repository's existing equivalent location if one is obvious; otherwise use the default `docs/PLAN.md`, `docs/PROGRESS.md`, and `docs/COMPLETED.md` paths. Inspect enough context first to make it useful:
 
 - `README.md`, if present
 - package or build config such as `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `Makefile`, or `justfile`
@@ -57,7 +60,7 @@ If `docs/PLAN.md` or `docs/PROGRESS.md` does not exist, create the minimum task-
 
 Do not invent product requirements. Mark unknowns as `확인 필요` or record the narrowest safe assumption.
 
-When no active work remains and the selected task or milestone is complete, `docs/PLAN.md` and `docs/PROGRESS.md` should visibly contain a single clear state:
+When no active work remains and the selected task or milestone is complete, the active roadmap and progress log should visibly contain a single clear state:
 
 ```text
 현재 active 작업 없음
@@ -76,18 +79,20 @@ Before implementation, identify or record the contract for the selected task or 
 - known risks
 - human decisions required
 
-If details are missing, make the narrowest safe assumption and record it in `docs/PROGRESS.md`. Stop and ask only when ambiguity affects correctness, public API behavior, security, credentials, permissions, billing, production, user data, or destructive changes.
+If details are missing, make the narrowest safe assumption and record it in the progress log. Stop and ask only when ambiguity affects correctness, public API behavior, security, credentials, permissions, billing, production, user data, or destructive changes.
 
 ## PLAN.md Refill Policy
 
-`docs/PLAN.md` is the loop's active queue. The agent must keep it populated with the next useful work until the selected task or milestone is complete or blocked.
+The active roadmap document is the loop's active queue. The agent must keep it populated with the next useful work until the selected task or milestone is complete or blocked.
+
+Preserve the repository's existing heading style and terminology. Use names such as `In Progress`, `Active Plan`, and `Pending` only for a newly created default harness or when those headings already exist. If the repo uses headings such as `현재 우선순위`, `작업 목록`, `Next`, or `Backlog`, add or promote work inside that existing structure.
 
 Before changing code:
 
-1. If the user's requested task or milestone is not represented in `docs/PLAN.md`, add it before implementation.
+1. If the user's requested task or milestone is not represented in the active roadmap, add it before implementation.
 2. Break the task into the smallest reviewable stories that can move independently.
-3. Put exactly one story in `In Progress` or `Active Plan`.
-4. Put known remaining stories in `Pending`.
+3. Put exactly one story in the repository's current/in-progress section.
+4. Put known remaining stories in the repository's pending/backlog/next section.
 5. Each story must include:
    - status: `pending`, `in_progress`, or `blocked`
    - goal
@@ -99,10 +104,10 @@ Before changing code:
 
 During the loop:
 
-- Continue current work from `docs/PROGRESS.md` first.
-- Otherwise continue the current `in_progress` story from `docs/PLAN.md`.
+- Continue current work from the progress log first.
+- Otherwise continue the current `in_progress` story from the active roadmap.
 - Otherwise promote the highest-priority pending story.
-- If active and pending work are empty but the selected task or milestone is not complete, synthesize the next smallest story from remaining acceptance criteria, failed verification, review findings, or documented gaps, then add it to `docs/PLAN.md` before implementation.
+- If active and pending work are empty but the selected task or milestone is not complete, synthesize the next smallest story from remaining acceptance criteria, failed verification, review findings, or documented gaps, then add it to the active roadmap before implementation.
 - If new work is discovered, add only work required for the selected task or milestone. Put unrelated ideas into follow-up notes or leave them out.
 - If the next story requires a product, architecture, security, auth, credential, billing, production, or data-loss decision, stop as blocked instead of guessing.
 
@@ -110,27 +115,27 @@ During the loop:
 
 Repeat while useful work remains:
 
-1. Read active state: `AGENTS.md`, `docs/PLAN.md`, `docs/PROGRESS.md`.
-2. Ensure the requested task is represented in `docs/PLAN.md`; if not, add the task contract and first small story.
+1. Read active state: `AGENTS.md`, the active roadmap, and the progress log.
+2. Ensure the requested task is represented in the active roadmap; if not, add the task contract and first small story.
 3. Select one coherent story using the PLAN refill policy.
-4. Keep exactly one small story in `In Progress` or `Active Plan`.
-5. Update `docs/PROGRESS.md` before implementation with current state, changed files if known, blocker, verification plan, and next action.
+4. Keep exactly one small story in the current/in-progress area.
+5. Update the progress log before implementation with current state, changed files if known, blocker, verification plan, and next action.
 6. Implement the smallest reviewable change that moves the story forward.
 7. Keep code and documentation aligned in the same story.
 8. Run relevant verification: tests, build, lint, typecheck, smoke checks, direct local execution, or repository-defined scripts.
-9. Record commands and results in `docs/PROGRESS.md`.
+9. Record commands and results in the progress log.
 10. Review `git diff --stat` and relevant diffs for regressions, missing tests, public interface drift, output/schema drift, and documentation drift.
 11. Compare the story against its acceptance criteria and verification results.
-12. If the story is incomplete, update `docs/PLAN.md` and `docs/PROGRESS.md` with the remaining work and continue.
-13. If the story is complete, append a detailed entry to `docs/COMPLETED.md`.
-14. Remove completed work from `docs/PLAN.md` and `docs/PROGRESS.md`.
+12. If the story is incomplete, update the active roadmap and progress log with the remaining work and continue.
+13. If the story is complete, append a detailed entry to the completed archive.
+14. Remove completed work from the active roadmap and progress log.
 15. Add or promote the next story when the milestone still has unmet acceptance criteria.
-16. Commit locally only if the user explicitly requested commits for this loop or repository instructions clearly require local commits.
+16. Commit locally only if the user explicitly requested commits for this loop or repository instructions clearly require local commits. Before committing, re-check `git status --short`, identify exactly which files belong to this story, and do not commit unrelated modified, staged, or untracked files.
 17. Continue until the selected task or milestone is complete, or stop as blocked.
 
 ## Document Rules
 
-`docs/PLAN.md`:
+Active roadmap document:
 
 - contains only current and future work
 - includes goal, priority, in-progress story, pending stories, completion criteria, next execution order, and verification commands
@@ -138,14 +143,14 @@ Repeat while useful work remains:
 - is refilled automatically with the next required story while the selected task or milestone remains incomplete
 - does not keep completed work
 
-`docs/PROGRESS.md`:
+Progress log document:
 
 - contains only the current incomplete state
 - records current task, state summary, blocker, changed files, recent verification, failures, and next action
 - is updated before implementation and after meaningful implementation, documentation changes, review, verification, or interruption
 - does not keep completed history
 
-`docs/COMPLETED.md`:
+Completed archive document:
 
 - is append-only
 - uses continuous numbering only inside that file when the repository already follows that convention
@@ -158,15 +163,15 @@ Repeat while useful work remains:
 Return `LOOP_COMPLETE` only when all are true:
 
 - the user's selected task or milestone is satisfied
-- `docs/PLAN.md` acceptance criteria are satisfied
+- active roadmap acceptance criteria are satisfied
 - relevant verification passed, or inability to verify is explicitly documented with a reason
 - self-review did not find unresolved regressions or missing required tests
 - code and documentation are consistent
-- completed work was appended to `docs/COMPLETED.md`
-- completed work was removed from `docs/PLAN.md` and `docs/PROGRESS.md`
+- completed work was appended to the completed archive
+- completed work was removed from the active roadmap and progress log
 - when no active work remains, active docs show `현재 active 작업 없음`
 
-If any acceptance criterion remains unmet, add or promote the next story in `docs/PLAN.md` and continue instead of returning `LOOP_COMPLETE`.
+If any acceptance criterion remains unmet, add or promote the next story in the active roadmap and continue instead of returning `LOOP_COMPLETE`.
 
 ## Safety Boundaries
 
@@ -188,7 +193,9 @@ Never mark work complete from self-review alone.
 
 Prefer repository-defined verification commands. If none are obvious, inspect the package, build, and test config and choose the narrowest valid command.
 
-If verification cannot be run, record the reason in `docs/PROGRESS.md`.
+Verification should default to local and non-mutating commands. Do not run verification that requires production credentials, billing systems, remote writes, deploy-like side effects, destructive migrations, or live external systems unless the user explicitly asked for that action. If such verification is required, stop as blocked and record the required approval or credential.
+
+If verification cannot be run, record the reason in the progress log.
 
 ## Stop Conditions
 
@@ -203,7 +210,7 @@ Stop with `LOOP_BLOCKED` when:
 - continuing would require guessing about security, auth, permissions, money movement, or user data
 - PLAN refill would require inventing product direction rather than deriving the next story from the selected task, acceptance criteria, verification failures, or review findings
 
-When blocked, update `docs/PROGRESS.md` with current state, blocker, evidence, last verification result, required decision, and suggested next action.
+When blocked, update the progress log with current state, blocker, evidence, last verification result, required decision, and suggested next action.
 
 ## Final Response
 
