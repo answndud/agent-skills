@@ -64,6 +64,13 @@
 - 쓰지 않을 때: 일반 코딩, 자율 개발 루프 실행, PRD/TRD/ADR 작성, 단발 문서 수정.
 - 결과물: `docs/PLAN.md`, `docs/PROGRESS.md`, `docs/COMPLETED.md`, 필요 시 compact `AGENTS.md` 규칙.
 
+## pre-mortem
+
+- 용도: 현재 프로젝트나 앱이 출시 후 실패했다고 가정하고 loophole, 약한 가정, 누락된 안전장치, proper fix를 저장소 근거 기반으로 찾는다.
+- 쓸 때: "pre-mortem", "사전 부검", "실패 시나리오", "loopholes", "proper fixes", "100% 확신 있나요", "출시 전 리스크 점검", "보완점 찾아줘".
+- 쓰지 않을 때: 이미 발생한 버그 원인 진단, 현재 diff 코드 리뷰, 순수 아키텍처 리팩터링 후보 탐색, 테스트 계획만 필요한 경우.
+- 결과물: confidence 평가, executive summary, Risk Register, unverified assumptions, recommended fix sequence.
+
 ## prd-trd-adr
 
 - 용도: 저장소 근거를 바탕으로 프로젝트 시작 문서인 PRD, TRD, ADR을 작성하거나 기존 문서와 reconcile한다.
