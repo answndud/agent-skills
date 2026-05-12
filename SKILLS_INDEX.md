@@ -1,5 +1,7 @@
 # Global Skills Index
 
+Updated: 2026-05-12
+
 이 문서는 `/Users/alex/.agents/skills` 전역 스킬의 빠른 참조용 인덱스다.
 
 주의:
@@ -7,34 +9,43 @@
 - 이 파일은 안내 문서이며 스킬이 아니다.
 - Codex가 스킬로 인식하는 대상은 각 하위 폴더의 `SKILL.md`다.
 - 스킬을 직접 호출할 때는 `$skill-name` 형식을 사용한다.
+- 스킬을 수정하거나 추가하면 이 인덱스도 함께 갱신한다.
+
+## bounty-radar
+
+- 용도: 유료 오픈소스 bounty, bug bounty, micro-task, grant성 후보를 제출/claim/PR 전에 검증하고 점수화한다.
+- 쓸 때: "돈 벌 후보", "다음 주제", "제출할만한 repo", bounty 후보 탐색, paid task 선별, 중복/과밀/assignment-gated 제출을 피해야 할 때.
+- 쓰지 않을 때: 실제 지급 보장, maintainer 규칙 우회, 불법 접근/credential/captcha/payment abuse 같은 위험 작업.
+- 결과물: 후보별 `Reward / State / Crowding / Gate / Score / Decision` 표, `submit_now`/`claim_first`/`hold`/`reject` 결정, top pick, public action draft, reject log.
+- 보조 파일: `scripts/score_candidates.py`, `agents/openai.yaml`.
 
 ## brain-storm
 
-- 용도: 현재 저장소를 근거로 다음 기능, 개선점, 제품 아이디어를 3-5개 발굴하고 사용자가 선택한 아이디어만 `brain-storm/` 아래에 저장한다.
-- 쓸 때: "아이디어 브레인스토밍", "다음 기능 아이디어", "개선점 발굴", "future opportunities", "brain-storm 해줘".
-- 쓰지 않을 때: 바로 구현, PRD/TRD/ADR 작성, 코드 리뷰, 자율 개발 루프, 단순 설명.
-- 결과물: 저장소 근거가 붙은 아이디어 후보 목록, 선택 시 `brain-storm/**/*.md` 아이디어 파일.
+- 용도: 현재 저장소를 근거로 다음 기능, 개선점, 제품 아이디어를 3-5개 발굴하거나 기존 brainstorm note를 정리한다.
+- 쓸 때: "아이디어 브레인스토밍", "다음 기능 아이디어", "개선점 발굴", "future opportunities", "brainstorm notes 정리", "brain-storm 해줘".
+- 쓰지 않을 때: 바로 구현, dev-loop 실행, PRD/TRD/ADR 작성, 코드 리뷰, release notes, 단순 설명.
+- 결과물: 저장소 근거가 붙은 아이디어 후보 목록, 사용자가 선택한 경우에만 `brain-storm/**/*.md` 아이디어 파일.
 
 ## codex-session-slimmer
 
-- 용도: `~/.codex/sessions`의 오래된 Codex session JSONL을 삭제하지 않고 직접 줄여 디스크 사용량을 줄인다.
+- 용도: `~/.codex/sessions`의 오래된 Codex session JSONL을 삭제하지 않고 필드 단위로 줄여 디스크 사용량을 줄인다.
 - 쓸 때: 특정 `YYYY/MM` 또는 `YYYY/MM/DD` 세션 폴더가 너무 커서 rollout JSONL 내용을 보존 가능한 범위에서 슬림화하고 싶을 때.
-- 쓰지 않을 때: 세션 파일 전체 삭제, 활성 세션 보호가 필요한 일반 cleanup, 별도 archive 생성.
-- 결과물: 수정된 JSONL 파일, 파일별 before/after 크기와 어떤 필드를 줄였는지 보고.
+- 쓰지 않을 때: 세션 파일 전체 삭제, live Desktop 세션 보호가 필요한 일반 cleanup, 별도 archive 생성.
+- 결과물: 유효한 JSONL을 유지한 수정 파일, 파일별 before/after 크기, 어떤 heavy field를 줄였는지 보고.
 
 ## dev-loop
 
-- 용도: 특정 작업이나 milestone을 계획, 구현, 검증, 리뷰, 완료 archive까지 반복해서 끝까지 밀어붙이는 자율 개발 루프다.
+- 용도: 사용자가 명시한 task, milestone, release, completion target을 계획-구현-검증-리뷰-archive 루프로 끝까지 진행한다.
 - 쓸 때: "끝까지 개발", "완성될 때까지 반복", "재귀 루프", "계획-개발-리뷰 루프", "v1 완성", "milestone complete".
-- 쓰지 않을 때: 일반적인 작은 코드 수정, 단발 설명, 수동 단계별 진행, 범위가 열린 리팩터링.
-- 결과물: 코드 변경, 검증 결과, `docs/PLAN.md`, `docs/PROGRESS.md`, `docs/COMPLETED.md` 상태 갱신.
+- 쓰지 않을 때: 일반적인 작은 코드 수정, 단발 설명, simple review, 수동 단계별 진행, 완료 기준이 열린 리팩터링.
+- 결과물: 코드 변경, 검증 결과, active roadmap/progress/archive 문서 갱신, 완료 시 active 문서의 `현재 active 작업 없음` 상태.
 
 ## diagnose
 
 - 용도: 어려운 버그, 실패 테스트, 오류, flaky behavior, 성능 회귀를 재현 루프부터 만들어 원인을 좁히고 고친다.
 - 쓸 때: "diagnose", "debug", "디버그", "진단", "원인 찾아줘", "테스트가 실패해", "성능이 느려졌어".
-- 쓰지 않을 때: 재현 없이 바로 best-effort patch만 원하는 단순 수정.
-- 결과물: 재현 루프, 가설 목록, 계측 결과, 최소 수정, 회귀 테스트 또는 테스트 seam 부재 보고.
+- 쓰지 않을 때: 재현 없이 바로 best-effort patch만 원하는 단순 수정, 출시 전 리스크 점검, test plan만 필요한 경우.
+- 결과물: 재현 루프, 관찰/가설/검증 기록, 최소 수정, 회귀 테스트 또는 테스트 seam 부재 보고.
 
 ## find-session
 
@@ -48,28 +59,22 @@
 - 용도: 계획, 설계, 구현 전략, PRD/TRD/ADR, 의사결정을 한국어로 한 질문씩 집요하게 검증한다.
 - 쓸 때: "grill me", "계획 검증", "설계 검증", "압박 질문", "의사결정 점검".
 - 쓰지 않을 때: 바로 구현해야 하는 명확한 작업, 질문 없이 문서로 정리해야 하는 경우.
-- 결과물: 한 번에 하나의 질문, 추천 답변, 이유, 마지막에는 확정 결정과 남은 리스크 요약.
+- 결과물: 한 번에 하나의 질문, 추천 답변, 이유, 마지막 확정 결정과 남은 리스크 요약.
 
 ## improve-codebase-architecture
 
 - 용도: 코드베이스에서 deep module 후보, 구조 개선, testability와 locality를 높일 리팩터링 기회를 찾는다.
 - 쓸 때: "아키텍처 개선", "구조 개선", "리팩터링 후보 찾기", "코드베이스 구조 점검", "make code more testable".
 - 쓰지 않을 때: 즉시 구현할 작은 기능, 단순 cleanup, diff 리뷰, TDD 구현.
-- 결과물: 파일/모듈별 architecture friction, deepening opportunity 후보, 사용자 선택 후 설계 질문 루프.
+- 결과물: architecture friction, deepening opportunity 후보, 우선순위, 선택 후 설계 질문 루프.
 
 ## plan-progress-completed
 
-- 용도: 프로젝트에 `PLAN.md`, `PROGRESS.md`, `COMPLETED.md` 작업 상태 하네스를 설치하거나 개선한다.
-- 쓸 때: "PLAN/PROGRESS/COMPLETED 하네스", "작업 상태 문서 세팅", "세션 재개 문서", "작업 중단/재개 가능하게".
-- 쓰지 않을 때: 일반 코딩, 자율 개발 루프 실행, PRD/TRD/ADR 작성, 단발 문서 수정.
-- 결과물: `docs/PLAN.md`, `docs/PROGRESS.md`, `docs/COMPLETED.md`, 필요 시 compact `AGENTS.md` 규칙.
-
-## pre-mortem
-
-- 용도: 현재 프로젝트나 앱이 출시 후 실패했다고 가정하고 loophole, 약한 가정, 누락된 안전장치, proper fix를 저장소 근거 기반으로 찾는다.
-- 쓸 때: "pre-mortem", "사전 부검", "실패 시나리오", "loopholes", "proper fixes", "100% 확신 있나요", "출시 전 리스크 점검", "보완점 찾아줘".
-- 쓰지 않을 때: 이미 발생한 버그 원인 진단, 현재 diff 코드 리뷰, 순수 아키텍처 리팩터링 후보 탐색, 테스트 계획만 필요한 경우.
-- 결과물: confidence 평가, executive summary, Risk Register, unverified assumptions, recommended fix sequence.
+- 용도: 프로젝트에 재개 가능한 작업 상태 하네스를 설치하거나 기존 하네스를 보강한다.
+- 쓸 때: "PLAN/PROGRESS/COMPLETED 하네스", "작업 상태 문서 세팅", "세션 재개 문서", "초기 하네스 적용", "작업 중단/재개 가능 문서 세팅", "이 하네스 수준을 높여줘".
+- 쓰지 않을 때: 일반 코딩, one-off 문서 수정, feature implementation, autonomous development loop, release loop, code review.
+- 결과물: `docs/PLAN.md`, `docs/PROGRESS.md`, `docs/COMPLETED.md`, compact `AGENTS.md` 작업 상태 문서 규칙.
+- 핵심 규칙: 기존 내용은 보존하고 보수적으로 merge한다. active 작업이 없으면 `PLAN.md`와 `PROGRESS.md`에 `현재 active 작업 없음`을 명확히 둔다.
 
 ## prd-trd-adr
 
@@ -77,6 +82,13 @@
 - 쓸 때: "PRD/TRD/ADR 만들어줘", "프로젝트 시작 문서", "제품 요구사항 문서", "기술 요구사항 문서", "아키텍처 결정 기록".
 - 쓰지 않을 때: 일반 코딩, 단발 README 수정, active task harness 설치, 자율 개발 루프.
 - 결과물: `docs/PRD.md`, `docs/TRD.md`, `docs/ADR.md` 또는 기존 equivalent 문서 갱신.
+
+## pre-mortem
+
+- 용도: 현재 프로젝트나 앱이 출시 후 실패했다고 가정하고 loophole, 약한 가정, 누락된 안전장치, proper fix를 저장소 근거 기반으로 찾는다.
+- 쓸 때: "pre-mortem", "premortem", "사전 부검", "실패 시나리오", "loopholes", "proper fixes", "100% 확신 있나요", "출시 전 리스크 점검", "보완점 찾아줘".
+- 쓰지 않을 때: 이미 발생한 버그 원인 진단, 현재 diff 코드 리뷰, 순수 아키텍처 리팩터링 후보 탐색, 테스트 계획만 필요한 경우.
+- 결과물: confidence 평가, executive summary, Risk Register, unverified assumptions, recommended fix sequence.
 
 ## repo-review
 
@@ -99,6 +111,13 @@
 - 쓰지 않을 때: 기능 구현, 버그 수정 자체, public API 변경, 광범위한 architecture rewrite, review-only 요청.
 - 결과물: 작은 cleanup patch, 검증 결과, deferred simplification 후보.
 
+## spring-boot-doctor
+
+- 용도: Spring Boot 백엔드 변경 직후 diff 기반 품질 진단 루프를 실행한다.
+- 쓸 때: controller/service/repository/entity/security/JWT/session/Flyway/application.yml/Redis/Actuator/Docker/CI 변경 후, 기능 구현/버그 수정 후 commit 전, "Spring Boot Doctor", "백엔드 품질 점검", "운영 안정성 점검".
+- 쓰지 않을 때: 순수 프론트엔드 변경, 단순 README 문구 수정, Spring Boot 런타임과 무관한 이미지/디자인 변경.
+- 결과물: baseline/current health score, regression, P0/P1/P2/P3 이슈, 실행 명령, 적용 수정, 남은 리스크가 포함된 한국어 doctor 보고서.
+
 ## tdd
 
 - 용도: 기능, 버그 수정, 동작 변경을 test-first 방식으로 `RED -> GREEN -> REFACTOR` 한 사이클씩 구현한다.
@@ -118,14 +137,14 @@
 - 용도: PRD, plan, spec, architecture note, feature idea를 구현 가능한 vertical slice issue로 쪼갠다.
 - 쓸 때: "이슈로 쪼개기", "티켓 생성", "작업 분해", "implementation tickets", PRD/spec/plan을 issue로 전환.
 - 쓰지 않을 때: PRD 자체 작성, 코드 구현, broad architecture review.
-- 결과물: HITL/AFK로 표시된 issue breakdown, dependency order, acceptance criteria, 필요 시 issue draft.
+- 결과물: HITL/AFK로 표시된 issue breakdown, dependency order, acceptance criteria, 필요 시 issue draft 또는 issue tracker 발행.
 
 ## to-prd
 
 - 용도: 현재 대화, 저장소 이해, rough requirements, feature idea를 PRD로 합성한다.
 - 쓸 때: "PRD로 정리", "요구사항 문서화", "제품 요구사항 정리", "spec 작성", 현재 논의를 PRD로 만들기.
 - 쓰지 않을 때: 여러 구현 issue로 분해해야 하는 경우, PRD/TRD/ADR 3종 프로젝트 시작 문서가 필요한 경우.
-- 결과물: Problem Statement, Solution, User Stories, Implementation Decisions, Testing Decisions, Acceptance Criteria가 포함된 PRD.
+- 결과물: Problem Statement, Solution, Goals, Non-Goals, User Stories, Implementation Decisions, Testing Decisions, Acceptance Criteria가 포함된 PRD.
 
 ## zoom-out
 

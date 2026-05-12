@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bounty Radar"
+  short_description: "Score paid OSS bounty candidates"
+  default_prompt: "Use $bounty-radar to find and score paid open-source bounty candidates before submitting."
