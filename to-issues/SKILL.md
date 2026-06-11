@@ -29,7 +29,7 @@ If an issue reference is provided, fetch and read its body and relevant comments
 If repository context is needed and not already known:
 
 1. Read `AGENTS.md` if present.
-2. Read relevant PRD/TRD/ADR/PLAN/PROGRESS docs.
+2. Read relevant PRD/TRD/ADR/PLAN docs. Read DONE docs only when past completed context matters.
 3. Inspect only enough source and tests to understand current architecture and vocabulary.
 4. Respect existing ADRs in the affected area.
 

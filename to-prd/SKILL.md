@@ -34,7 +34,7 @@ When working inside a project:
    - `docs/TRD.md`
    - `docs/ADR.md`
    - `docs/PLAN.md`
-   - `docs/PROGRESS.md`
+   - `docs/DONE.md`, only when past completed context matters
    - relevant files discovered with `rg --files docs`
 3. Inspect package/config and relevant source entrypoints only enough to understand current behavior.
 4. Use the project's domain vocabulary.

@@ -1,184 +1,117 @@
 ---
 name: repo-review
-description: Use only when the user explicitly asks to review code or repository changes, such as "리뷰해줘", "코드리뷰", "변경사항 점검", "merge 전 점검", "diff 리뷰", "PR 리뷰", or "review this diff". This skill reviews the current worktree diff by default and reports findings first. Do not use for normal coding, autonomous development loops, harness setup, PRD/TRD/ADR writing, or one-off explanations.
+description: Use only when the user explicitly asks to review code or repository changes, inspect risks, find missing tests, produce a test plan, or suggest validation for a concrete diff/scope. Triggers include "리뷰해줘", "코드리뷰", "변경사항 점검", "merge 전 점검", "diff 리뷰", "PR 리뷰", "테스트 계획", "테스트 케이스", "검증 루틴", "coverage gap", "testing strategy", or "review this diff". This skill is read-only by default and reports findings, test gaps, and validation recommendations. Do not use for normal coding, cleanup/refactor execution, autonomous development loops, harness setup, PRD/TRD/ADR writing, or one-off explanations.
 ---
 
 # Repo Review
 
-## Purpose
+Read-only judgment for repository changes.
 
-Use this skill to review repository changes for bugs, regressions, security risks, contract drift, missing tests, and documentation drift.
+Use this skill to review a concrete diff, PR, commit range, module, or feature scope for:
 
-Default mode is review-only. Do not edit files unless the user explicitly asks to fix or modify the issues in the same request.
+- bugs and regressions
+- security, authorization, privacy, data-loss, or destructive-operation risks
+- public API, CLI, schema, config, output, or compatibility drift
+- missing tests, weak coverage, and needed validation
+- documentation drift
+- maintainability risks likely to cause defects
 
-## Activation Rules
+Default mode is read-only. Do not edit files unless the user explicitly asks to fix issues in the same request.
 
-Use this skill only when the user explicitly asks for a review, such as:
+## Activation
 
-- "리뷰해줘"
-- "코드리뷰 해줘"
-- "변경사항 점검"
-- "merge 전 점검"
-- "diff 리뷰"
-- "PR 리뷰"
-- "review this diff"
+Use for explicit review or test-planning requests against code/repository context:
 
-Do not use this skill for:
+- `리뷰`, `코드리뷰`, `변경사항 점검`, `merge 전 점검`, `diff 리뷰`, `PR 리뷰`
+- `테스트 계획`, `테스트 케이스`, `검증 루틴`, `어떤 테스트 짜야 해?`
+- `review this diff`, `testing strategy`, `coverage gap`, `validation plan`
 
-- normal implementation requests
-- broad refactors
-- autonomous development loops
-- PLAN/PROGRESS/COMPLETED harness setup
-- PRD/TRD/ADR document writing
-- release notes or changelog writing
-- one-off explanations that are not review requests
+Do not use for normal implementation, behavior-preserving cleanup, broad refactors, autonomous loops, PLAN/DONE harness setup, PRD/TRD/ADR writing, release notes, or one-off explanations.
 
-## Review Target
+## Target
 
 Default target is the current worktree diff.
 
-Start with:
+Inspect:
 
 1. `git status --short`
 2. `git diff --stat`
-3. `git diff --staged --stat`, when staged changes exist
-4. `git diff`
-5. `git diff --staged`, when staged changes exist
+3. `git diff`
+4. staged diff/stat when staged changes exist
+5. relevant untracked files
 
-Use `git status --short` to identify untracked files (`??`). Untracked files do not appear in `git diff`; read and review relevant new source, docs, config, and test files directly.
+If the user specifies a PR, branch, commit range, base/head, paths, module, or feature, review that target. If there is no concrete target, say what target is needed.
 
-When both staged and unstaged changes exist, review them together as the user's effective change. If the same file has both staged and unstaged edits, call out the split state when it affects review confidence or the likely final patch.
+## Context
 
-If the user specifies a PR, branch, commit, base/head range, or path subset, review that explicit target instead.
+Read only enough context to evaluate the target:
 
-If there is no diff and no explicit target, say there is nothing to review and suggest the exact target needed.
+- `AGENTS.md`
+- `docs/PLAN.md` for active task intent
+- `docs/DONE.md` only when historical context matters
+- adjacent package/config/test/schema/public interface files
+- tests, fixtures, mocks, examples, snapshots, CI, or validation commands near the target
 
-## Context To Read
+Treat PLAN/DONE as read-only unless explicitly asked to update them.
 
-Read only enough context to evaluate the diff:
-
-- `AGENTS.md`, if present
-- `docs/PLAN.md` and `docs/PROGRESS.md`, if present, for current task intent and recent verification only
-- package, config, test, schema, or public interface files touched by or adjacent to the diff
-- existing tests covering the changed behavior
-- relevant untracked files reported by `git status --short`
-
-`docs/PLAN.md` and `docs/PROGRESS.md` are read-only context for this skill. Do not update them unless the user explicitly asks.
-
-For generated, binary, lockfile, snapshot, or very large diffs, summarize the artifact change and focus detailed review on the source-of-truth files. Still flag unexpected artifact drift, missing generated updates, or lockfile changes that do not match dependency changes.
+For generated, binary, lockfile, snapshot, or huge diffs, summarize the artifact and review source-of-truth files.
 
 ## Review Priorities
 
-Prioritize findings in this order:
+Order findings by severity and confidence:
 
-1. Bugs and behavioral regressions.
-2. Security, authorization, privacy, data-loss, and destructive-operation risks.
-3. Public API, CLI, schema, output, or compatibility drift.
-4. Missing or inadequate tests for changed behavior.
-5. Documentation drift when docs and behavior now disagree.
-6. Maintainability risks that are likely to cause concrete future defects.
+- `P0`: data loss, security incident, full build/deploy failure, critical outage
+- `P1`: major regression, auth/permission failure, broken public contract, high-probability runtime failure
+- `P2`: edge-case bug, missing test, docs/contract drift, meaningful maintainability risk
+- `P3`: low-impact improvement with concrete benefit
 
-Avoid low-signal comments:
+Avoid style-only comments, broad unrelated refactors, praise, and speculative findings without evidence.
 
-- style preferences without correctness impact
-- broad refactor suggestions unrelated to the diff
-- praise, cheerleading, or generic summaries
-- speculative findings without evidence
+## Test Planning
 
-If uncertain, state the assumption or open question instead of presenting it as a finding.
+When the user asks for test cases, validation strategy, coverage gaps, or when the review finds untested risk, include concrete recommendations:
 
-## Severity
+- high-risk behavior to cover
+- test cases by `P1/P2/P3`
+- suggested test level: unit, integration, API/CLI/browser/e2e, smoke, regression, snapshot/golden only when justified
+- suggested test location based on existing repo conventions
+- verification commands and what each proves
+- residual risk if tests are not run or no framework is visible
 
-Use priority labels consistently:
+Do not implement tests unless explicitly asked.
 
-- `P0`: data loss, security incident, full build/deploy failure, or critical outage.
-- `P1`: major feature regression, auth/permission failure, broken public contract, or high-probability runtime failure.
-- `P2`: edge-case bug, missing test, documentation or contract drift, or meaningful maintainability risk.
-- `P3`: low-impact improvement with a concrete benefit.
+## Output
 
-Findings should be ordered by severity, then confidence.
-
-## Output Format
-
-Lead with findings.
-
-When there are line-specific findings, use Codex inline review directives:
+Lead with findings. For line-specific issues, use Codex inline comments:
 
 ```text
-::code-comment{title="[P1] Short issue title" body="Explain the concrete risk and why this diff causes it." file="/absolute/path/to/file" start=10 end=12 priority=1 confidence=0.85}
+::code-comment{title="[P1] Short issue title" body="Explain the concrete risk and why this diff causes it." file="/absolute/path/to/file" start=10 end=12 priority=1}
 ```
 
-Keep line ranges tight. Use absolute file paths when possible.
+Then include concise sections as needed:
 
-After inline findings, include concise text sections:
+- `Findings`: say `발견한 문제 없음` when there are none
+- `Test Gaps / Validation Plan`: include concrete test cases or commands when relevant
+- `Open Questions / Assumptions`: only when they affect confidence
+- `Change Summary`: short secondary context
 
-- `Findings`: say "발견한 문제 없음" when there are no findings.
-- `Open Questions / Assumptions`: only if they affect the review.
-- `Test Gaps / Residual Risk`: mention tests not run or coverage still missing.
-- `Change Summary`: short secondary context, not the lead.
-
-For simple no-issue reviews, keep the final answer short.
+Omit empty sections except `Findings`.
 
 ## Fix Policy
 
-Default behavior is review-only.
-
-If the user explicitly asks to fix issues in the same request:
+If the user asks to fix:
 
 1. Present findings first.
-2. Re-check `git status --short` before editing.
-3. Identify the files that need edits and avoid unrelated modified files unless the fix requires them and the interaction is understood.
-4. Make the smallest safe changes needed to address accepted or obvious issues.
+2. Re-check `git status --short`.
+3. Make the smallest safe changes.
+4. Avoid unrelated modified files.
 5. Run relevant verification when available.
-6. Do not broaden scope beyond the reviewed diff.
+6. Do not broaden scope beyond the reviewed target.
 
-Never fix by running destructive commands or reverting unrelated user changes.
+Never use destructive commands or revert unrelated user changes.
 
-## Safety Boundaries
+## Boundaries
 
-Do not:
+Do not commit, push, tag, release, deploy, create PRD/TRD/ADR, update PLAN/DONE, run rewriting formatters/codegen, or call live external systems unless explicitly asked.
 
-- run formatters or codegen that rewrite tracked files during review-only mode
-- update `docs/PLAN.md`, `docs/PROGRESS.md`, or `docs/COMPLETED.md` unless explicitly asked
-- create or update PRD/TRD/ADR documents
-- start an autonomous development loop
-- commit, push, tag, release, or deploy
-- call live external systems unless the user explicitly asks and the review target requires it
-- infer secrets, credentials, billing behavior, or production state without evidence
-
-Tests, builds, typechecks, lint checks, and smoke checks may be run when they do not rewrite tracked files and are relevant to the review. If a command cannot be run, state why.
-
-## Review Checklist
-
-When reviewing, consider:
-
-- Does the changed behavior still satisfy the intended task?
-- Could this fail at runtime for common inputs?
-- Are authorization, ownership, trust boundaries, and sensitive data handled correctly?
-- Did a public contract, CLI output, schema, config format, or API response change without compatible handling?
-- Are failure paths and edge cases covered?
-- Are tests updated for the behavior that changed?
-- Are docs, examples, README, or generated reports now stale?
-- Are there unrelated changes mixed into the diff?
-
-## Final Response
-
-Use Korean by default unless the repository or user clearly uses another language. Keep code, paths, command names, and identifiers in their original form.
-
-Preferred response shape:
-
-```md
-Findings
-- ...
-
-Open Questions / Assumptions
-- ...
-
-Test Gaps / Residual Risk
-- ...
-
-Change Summary
-- ...
-```
-
-Omit empty sections except `Findings`.
+Non-mutating tests, builds, typechecks, lint checks, and smoke checks may be run when relevant. If a command cannot be run, state why.

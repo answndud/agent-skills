@@ -1,0 +1,162 @@
+# caveman-lite 사용 예시
+
+이 파일은 사용자 참고용입니다.
+SKILL.md 실행 규칙과는 무관합니다.
+이 스킬을 언제, 어떻게 호출할지 궁금할 때만 확인하세요.
+
+## 기본 사용
+
+프롬프트:
+[$caveman-lite] 지금 상태만 짧게 요약해줘.
+
+기대 출력:
+상태:
+- 구현 완료
+- 테스트 통과
+- 남은 것: 커밋
+
+## 작업 결과 요약
+
+프롬프트:
+[$caveman-lite] 방금 작업한 내용 final 답변 5줄 이하로 정리해줘.
+
+기대 출력:
+완료:
+- 로그인 redirect 버그 수정
+- 실패 케이스 테스트 추가
+- `npm test` 통과
+
+다음:
+- staging에서 OAuth smoke 확인
+
+## diff 리뷰
+
+프롬프트:
+[$caveman-lite] 이 diff 리뷰해줘. finding만.
+
+기대 출력:
+Findings:
+- P1 `src/auth.ts:42` 만료된 token도 통과 가능
+- P2 `src/api.ts:88` 내부 에러 메시지 노출
+
+Tests:
+- not run
+
+## 에러 원인 후보
+
+프롬프트:
+[$caveman-lite] 이 에러 원인 후보만 우선순위대로 짧게 알려줘.
+
+기대 출력:
+가능성:
+1. env 누락: `DATABASE_URL`
+2. migration 미적용
+3. Prisma client 미생성
+
+먼저:
+`pnpm prisma generate`
+
+## 커밋 메시지 후보
+
+프롬프트:
+[$caveman-lite] 커밋 메시지 3개만.
+
+기대 출력:
+- `Fix transcript API key fallback`
+- `Remove hardcoded YouTube API key`
+- `Handle missing Innertube API key`
+
+## PLAN.md 정리
+
+프롬프트:
+[$caveman-lite] 이 PLAN.md에서 stale한 말 제거하고 active/next만 남겨줘.
+
+기대 출력:
+수정 방향:
+- 완료된 항목 제거
+- Active는 현재 작업만 유지
+- 다음 액션 1개만 남김
+- 검증 결과는 최신 것만 유지
+
+## AGENTS.md 압축
+
+프롬프트:
+[$caveman-lite] 이 AGENTS.md 의미 유지하면서 중복 줄여줘.
+
+기대 출력:
+압축 기준:
+- 반복 규칙 제거
+- 파일 경로와 명령은 보존
+- 금지사항은 보존
+- 긴 배경 설명은 짧은 목적 문장으로 축약
+
+## 중간 진행 보고 줄이기
+
+프롬프트:
+[$caveman-lite] 앞으로 이 세션에서는 중간 보고를 짧게 해줘. 변경 파일, 검증, blocker만 말해.
+
+기대 출력:
+진행:
+- 파일: `src/main.ts`
+- 검증: 아직
+- blocker: 없음
+
+## 긴 설명이 필요 없는 질문
+
+프롬프트:
+[$caveman-lite] 이 방식 괜찮아? 결론만.
+
+기대 출력:
+결론: 괜찮음.
+
+조건:
+- rollback 쉬움
+- 테스트 있음
+- public API 변경 없음
+
+## 사용하지 않는 게 좋은 상황
+
+다음 상황에서는 caveman-lite를 쓰지 않는 편이 낫습니다.
+
+- secret leak, 권한, 보안 사고 처리
+- DB migration, 데이터 삭제, force push, history rewrite
+- production deploy
+- 요구사항이 모호해서 질문이 필요한 경우
+- 아키텍처 tradeoff를 설명해야 하는 경우
+- 초보자에게 개념을 설명해야 하는 경우
+- 법률, 금융, 의료, compliance 관련 설명
+
+예시:
+나쁨:
+[$caveman-lite] 이 secret scanning alert 어떻게 처리해?
+
+좋음:
+이 secret scanning alert를 안전하게 처리하는 옵션과 리스크를 설명해줘.
+
+## 좋은 호출 문장 모음
+
+[$caveman-lite] 핵심만.
+
+[$caveman-lite] 5줄 이하로.
+
+[$caveman-lite] finding만.
+
+[$caveman-lite] status만.
+
+[$caveman-lite] commit message만.
+
+[$caveman-lite] 중복 줄이고 의미 유지.
+
+[$caveman-lite] stale한 말 제거.
+
+[$caveman-lite] 명령어만.
+
+[$caveman-lite] 리스크와 다음 액션만.
+
+## 운영 팁
+
+- 기본 대화에는 쓰지 마세요.
+- 말이 길어지는 턴에만 켜세요.
+- 위험한 작업에는 쓰지 마세요.
+- 문서 압축에는 유용합니다.
+- 코드 자체보다 답변/요약/문서 정리에 더 잘 맞습니다.
