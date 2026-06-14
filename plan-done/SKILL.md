@@ -1,159 +1,218 @@
 ---
 name: plan-done
-description: Install or reconcile a lightweight PLAN/DONE project state harness for Codex sessions. Use when the user asks to set up, update, simplify, or improve project state documents, 작업 상태 문서, 세션 재개 문서, 하네스, PLAN.md/DONE.md, or plan/done 관리.
+description: Create, update, simplify, or reconcile lightweight docs/PLAN.md and bounded docs/DONE.md project state files, including executable phase/slice plans, without turning PLAN.md into AGENTS.md. Use for 작업 상태 문서, 세션 재개 문서, PLAN.md/DONE.md 관리, phase decomposition, or cleanup of bloated plans.
 ---
 
 # Plan Done
 
-Use this skill to create or reconcile a small project state harness that helps future Codex sessions resume work from a single active plan and a short completion archive.
-
-Core model:
+Use this skill to maintain a small project state harness:
 
 ```text
-AGENTS.md   = agent operating rules
-PLAN.md     = active, pending, blocked, and next work
-DONE.md     = short append-only archive of completed and verified work
+docs/PLAN.md = current/future work only, preferably as executable slices
+docs/DONE.md = recent completed work only, latest 30 entries
+AGENTS.md    = agent operating rules, only when explicitly requested
 ```
 
-The harness uses only `docs/PLAN.md`, `docs/DONE.md`, and a compact `AGENTS.md` rule section.
+## Core Rule
 
-## Principles
+`docs/PLAN.md` is not `AGENTS.md`.
 
-- Keep the state surface small.
-- Make `docs/PLAN.md` the first and usually only state document a new session reads.
-- Use `docs/DONE.md` only when historical context is needed or when appending completed work.
-- Treat `docs/PLAN.md` active cleanup as the highest-priority completion update.
-- Append to `docs/DONE.md` with a short entry, preferably five bullets or fewer.
-- Do not keep completed work in `docs/PLAN.md`.
-- Do not create PRD, TRD, ADR, README, scripts, references, assets, or extra documentation for this harness unless the user explicitly asks.
+Do not put these in `docs/PLAN.md`:
+
+- agent operating rules
+- commit/stage/push rules
+- subagent rules
+- broad tool usage policy
+- long "correction" or postmortem sections
+- generic safety philosophy
+- repeated external-evidence disclaimers
+- completed work history
+- large status dashboards
+- boilerplate that does not tell the next agent what to build next
+
+If those rules are needed, they belong in `AGENTS.md`, and only if the user
+explicitly asks to update AGENTS.md.
+
+## Planning Principle
+
+Write `docs/PLAN.md` for implementation, not contemplation.
+
+When `다음 액션` is abstract, rewrite it into small executable slices. Each slice
+must name likely edit files, concrete change, exact verification, observable
+done condition, and one guardrail. Prefer one next delegated slice over a broad
+phase handoff.
+
+If active work exists, include exactly one `## Next` section at the top of
+`docs/PLAN.md` so a low-cost implementation agent can start without scanning
+the whole file. Do not include hidden reasoning, speculative alternatives,
+pasted code, logs, diffs, or tutorial text.
 
 ## Startup Inspection
 
-Before editing, inspect enough repository context to make the harness useful.
+Read only enough context to write a useful active plan.
 
-Check, when present:
+Usually inspect:
 
 1. `AGENTS.md`
-2. `README.md`
-3. `docs/`
-4. Existing state files:
-   - `docs/PLAN.md`
-   - `docs/DONE.md`
-5. Important project docs:
-   - `docs/product/**`
-   - `docs/architecture*`
-   - `docs/development*`
-   - `docs/testing*`
-   - `docs/prd*`
-   - `docs/trd*`
-   - `docs/adr*`
-   - `PRODUCT.md`
-   - `DESIGN.md`
-6. Build and validation entry points:
-   - `package.json`
-   - `pyproject.toml`
-   - `Cargo.toml`
-   - `go.mod`
-   - `Makefile`
-   - `justfile`
-   - `.github/workflows/**`
+2. existing `docs/PLAN.md`
+3. existing `docs/DONE.md` only if recent history is needed
+4. important product/build files named by the user or obvious from the task
+5. nearby tests/build files needed to make verification concrete
 
-Use `rg --files` for discovery. Do not audit the whole codebase; gather only enough to identify project purpose, active work, likely validation commands, and existing harness state.
+Use `rg --files` for discovery. Do not audit the whole repository unless the
+user asked for a broad plan from scratch.
 
-## Output Files
+## Output Scope
 
-Create or reconcile only:
+Default editable files:
 
 - `docs/PLAN.md`
 - `docs/DONE.md`
-- `AGENTS.md`
 
-Never erase useful historical content without explicit user approval.
+Do not edit `AGENTS.md` unless the user explicitly asks for AGENTS.md or agent
+operating rules.
+
+Do not create PRD/TRD/ADR, README, scripts, references, assets, or extra docs
+for this harness unless explicitly requested.
 
 ## PLAN.md Shape
 
-`docs/PLAN.md` contains current and future work only.
+Keep `docs/PLAN.md` compact and actionable.
 
-Use this compact structure:
+Preferred structure:
 
 ```md
 # PLAN.md
 
 ## Goal
 
-<current milestone or "현재 active 작업 없음">
+<1-3 sentences about the current milestone and concrete finish state.>
+
+## Next
+
+- 위임: P<N>.<M>
+- 목표:
+- 파일:
+- 검증:
 
 ## Active
 
-### <task name>
+### P<N> - <short concrete name>
 
 - 상태: pending | in_progress | blocked
 - 목표:
-- 완료 기준:
-- 다음 액션:
+- 범위:
+  - 수정:
+  - 참조:
+  - 보존:
+- slices:
+  1. P<N>.1 - <verb + object>
+     - 파일:
+     - 변경:
+     - 검증:
+     - 완료:
+     - 금지:
 - 검증:
-- 관련 파일:
+- 완료:
 
 ## Backlog
 
-- ...
+- <optional future work, 3-10 bullets>
 ```
 
-When there is no active work, make that clear once. Do not fill the file with empty boilerplate.
+Add `## Acceptance Bar` after `## Goal` only when it prevents ambiguity about
+"done". Keep it to 5-8 bullets.
+
+Each Active item must be enough for the next agent to identify the edit files,
+change, verification, and exit condition. For tiny tasks, use one slice and
+keep `## Next` pointing at it.
+
+Avoid vague verbs such as "정리한다", "개선한다", "보강한다", "검토한다",
+or "반영한다". Prefer concrete verbs such as "add `<function>`", "extend
+`<schema>` with `<field>`", "render `<state>` in `<component>`", or "add a
+regression test for `<case>`".
+
+If a verification command is unknown, write the smallest discovery action
+instead of a vague placeholder:
+
+```md
+- 검증:
+  - `rg -n "test|vitest|jest|npm run" package.json -g 'package.json'`
+```
+
+## Phase and Slice Size
+
+A slice should usually edit 1-4 files. Split a phase if it touches more than 8
+likely edit files or mixes unrelated domains such as schema, state wiring, UI,
+persistence, network/runtime behavior, tests, release/docs, or security/public
+claim wording.
+
+Keep at most 3 active phases in `docs/PLAN.md` unless the user explicitly wants
+a broader roadmap. Backlog is for future work, not hidden active work.
+
+## Status Guidance
+
+- `pending`: ready to work.
+- `in_progress`: currently being worked.
+- `blocked`: use only when no meaningful local/source action can continue.
+
+Do not mark a task `blocked` merely because final public claims need external
+evidence, credentials, device access, or release approval. If local prep can be
+implemented, keep the task `pending` and make the completion criteria local.
 
 ## DONE.md Shape
 
-`docs/DONE.md` is a short append-only archive. A new session does not read it by default.
+`docs/DONE.md` is a bounded recent log. Keep only the latest 30 completed
+entries and delete older entries instead of preserving them elsewhere. New
+sessions should not need to read it by default.
 
-Use this compact structure:
+Use:
 
 ```md
 # DONE.md
 
-완료된 작업의 짧은 append-only archive다. 새 세션 시작 시 기본적으로 읽지 않는다.
+최근 완료 작업 30개만 보관한다. 오래된 항목은 삭제한다.
+새 세션 시작 시 기본적으로 읽지 않는다.
 
-## Archive
+## Recent
 
 ### YYYY-MM-DD - <task name>
 
 - 요약:
 - 변경:
 - 검증:
-- 결정:
 - 후속:
 ```
 
-Keep each entry to five bullets or fewer unless the user asks for a detailed handoff.
+Keep each entry to five bullets or fewer unless the user asks for a detailed
+handoff. Do not paste logs, diffs, or full command output.
 
-## Completion Rule
+When `docs/DONE.md` exceeds 30 entries, delete the oldest entries. Do not create
+historical backup files, monthly logs, or replacement history files unless
+explicitly requested.
 
-When pausing unfinished work, update the relevant Active task in `docs/PLAN.md` as a current snapshot, not a running log.
+## Completion Cleanup
 
 When a task is complete:
 
 1. Remove it from `docs/PLAN.md` Active.
 2. Append a short entry to `docs/DONE.md`.
-3. Leave only still-active, blocked, or future work in `docs/PLAN.md`.
+3. If `docs/DONE.md` has more than 30 entries, delete the oldest entries.
+4. Update `## Next` to the next unfinished slice, or remove it if no active
+   work remains.
+5. Leave only current, pending, or genuinely blocked work in `docs/PLAN.md`.
 
-If context is running long and only one update can be trusted, update `docs/PLAN.md` first. A stale active plan is more damaging than a missing archive entry.
+When only a slice is complete but the phase remains active:
 
-## AGENTS.md Rules
+1. Remove the completed slice, or mark it done only if the user wants visible
+   slice progress.
+2. Keep `## Next` pointing at the next unfinished slice.
+3. Do not create a running log.
 
-Add or reconcile a compact section like this:
-
-```md
-## 작업 상태 문서
-
-- 새 세션은 작업 전 `docs/PLAN.md`만 먼저 읽는다.
-- 과거 완료 맥락이 필요할 때만 `docs/DONE.md`를 읽는다.
-- 신규/진행/blocked 작업은 `docs/PLAN.md`에 기록한다.
-- 완료된 작업은 `docs/DONE.md`에 5줄 이하로 append한 뒤 `docs/PLAN.md`의 Active에서 제거한다.
-- `docs/PLAN.md`는 현재와 미래만 담고, 완료 이력은 남기지 않는다.
-- 코드 변경과 문서 업데이트는 같은 작업 단위에서 처리한다.
-```
-
-If the project already has richer `AGENTS.md` guidance, preserve it and add only missing state-document rules. Keep this section compact.
+When pausing unfinished work, update the relevant Active item as a current
+snapshot. Do not leave a running log.
 
 ## Language
 
-Use Korean by default unless the repository clearly uses another language.
+Use Korean by default unless the repository or user clearly prefers another
+language.
